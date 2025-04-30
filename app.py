@@ -45,21 +45,27 @@ y0 = st.sidebar.number_input("Valor inicial de y", value=3.0)
 learning_rate = st.sidebar.number_input("Tasa de aprendizaje", value=0.1, min_value=0.001, step=0.01)
 steps = st.sidebar.slider("Número de pasos", min_value=5, max_value=100, value=30, step=1)
 
+with st.sidebar:
+    st.markdown("""
+    <hr>
+    <div style="text-align: center; font-size: 0.9em; color: gray;">
+        Desarrollado por Carlos D. López P.
+    </div>
+    """, unsafe_allow_html=True)
+
 # Calcular trayectoria
 path = gradient_descent(learning_rate, steps, x0, y0)
 
-# Generar superficie con margen fijo o relativo
+# Generar superficie con margen dinámico ajustado
 if path.shape[0] > 1:
-    # Encontrar centro del recorrido
     x_center = np.mean(path[:, 0])
     y_center = np.mean(path[:, 1])
 
-    # Calcular rango dinámico con un margen más generoso
     max_range = max(
         abs(path[:, 0].max() - path[:, 0].min()),
         abs(path[:, 1].max() - path[:, 1].min()),
     )
-    spread = max(max_range * 1.5, 5)  # mínimo 5 para evitar recortes
+    spread = max(max_range * 1.2, 3.5)  # margen más ajustado
 
     x_min, x_max = x_center - spread, x_center + spread
     y_min, y_max = y_center - spread, y_center + spread
@@ -101,7 +107,7 @@ if path.shape[0] > 1:
         name='Final'
     ))
 
-    # Ajustar límites del eje z también
+    # Ajustar eje z con margen
     z_margin = 1.0
     z_min = min(path[:,2].min(), Z.min()) - z_margin
     z_max = max(path[:,2].max(), Z.max()) + z_margin
