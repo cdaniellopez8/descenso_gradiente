@@ -48,11 +48,23 @@ steps = st.sidebar.slider("Número de pasos", min_value=5, max_value=100, value=
 # Calcular trayectoria
 path = gradient_descent(learning_rate, steps, x0, y0)
 
-# Determinar límites dinámicos con un margen
+# Generar superficie con margen fijo o relativo
 if path.shape[0] > 1:
-    margin = 1.0
-    x_min, x_max = path[:,0].min() - margin, path[:,0].max() + margin
-    y_min, y_max = path[:,1].min() - margin, path[:,1].max() + margin
+    # Encontrar centro del recorrido
+    x_center = np.mean(path[:, 0])
+    y_center = np.mean(path[:, 1])
+
+    # Calcular rango dinámico con un margen más generoso
+    max_range = max(
+        abs(path[:, 0].max() - path[:, 0].min()),
+        abs(path[:, 1].max() - path[:, 1].min()),
+    )
+    spread = max(max_range * 1.5, 5)  # mínimo 5 para evitar recortes
+
+    x_min, x_max = x_center - spread, x_center + spread
+    y_min, y_max = y_center - spread, y_center + spread
+
+    # Crear malla
     x = np.linspace(x_min, x_max, 100)
     y = np.linspace(y_min, y_max, 100)
     X, Y = np.meshgrid(x, y)
@@ -89,15 +101,17 @@ if path.shape[0] > 1:
         name='Final'
     ))
 
-    # Layout dinámico
+    # Ajustar límites del eje z también
+    z_margin = 1.0
+    z_min = min(path[:,2].min(), Z.min()) - z_margin
+    z_max = max(path[:,2].max(), Z.max()) + z_margin
+
+    # Layout
     fig.update_layout(
         scene=dict(
-            xaxis_title='x',
-            yaxis_title='y',
-            zaxis_title='f(x, y)',
-            xaxis=dict(range=[x_min, x_max]),
-            yaxis=dict(range=[y_min, y_max]),
-            zaxis=dict(range=[path[:,2].min() - margin, path[:,2].max() + margin])
+            xaxis=dict(title='x', range=[x_min, x_max]),
+            yaxis=dict(title='y', range=[y_min, y_max]),
+            zaxis=dict(title='f(x, y)', range=[z_min, z_max])
         ),
         title="Descenso de Gradiente en f(x, y) = x² + y²",
         width=800,
