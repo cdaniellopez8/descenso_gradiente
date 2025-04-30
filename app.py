@@ -20,25 +20,39 @@ def grad_f(x, y):
     return np.array([2*x, 2*y])
 
 # --- Algoritmo de descenso de gradiente ---
-def gradient_descent(lr, steps, x0, y0):
+def gradient_descent(lr, steps, x0, y0, max_val=1e5):
     path = [(x0, y0, f(x0, y0))]
     x, y = x0, y0
     for _ in range(steps):
         grad = grad_f(x, y)
         x -= lr * grad[0]
         y -= lr * grad[1]
-        path.append((x, y, f(x, y)))
+        z = f(x, y)
+        if abs(x) > max_val or abs(y) > max_val or abs(z) > max_val:
+            st.warning("¡La trayectoria diverge con este learning rate! Reduce la tasa de aprendizaje.")
+            break
+        path.append((x, y, z))
     return np.array(path)
 
 # --- Interfaz Streamlit ---
-st.title("Simulador de Descenso de Gradiente en 3D con Plotly")
+st.title("Simulador de Descenso de Gradiente en 3D")
 st.markdown("### Función: $f(x, y) = x^2 + y^2$")
 
-# Controles
-learning_rate = st.slider("Tasa de aprendizaje", min_value=0.001, max_value=5.0, value=0.1, step=0.01)
-steps = st.slider("Número de pasos", min_value=5, max_value=100, value=30, step=1)
-x0 = st.slider("Valor inicial x", -5.0, 5.0, value=3.0, step=0.1)
-y0 = st.slider("Valor inicial y", -5.0, 5.0, value=3.0, step=0.1)
+# Sidebar inputs
+st.sidebar.header("Parámetros de simulación")
+
+x0 = st.sidebar.number_input("Valor inicial de x", value=3.0)
+y0 = st.sidebar.number_input("Valor inicial de y", value=3.0)
+learning_rate = st.sidebar.number_input("Tasa de aprendizaje", value=0.1, min_value=0.001, step=0.01)
+steps = st.sidebar.slider("Número de pasos", min_value=5, max_value=100, value=30, step=1)
+
+with st.sidebar:
+    st.markdown("""
+    <hr>
+    <div style="text-align: center; font-size: 0.9em; color: gray;">
+        Desarrollado por Carlos D. López P.
+    </div>
+    """, unsafe_allow_html=True)
 
 # Calcular trayectoria
 path = gradient_descent(learning_rate, steps, x0, y0)
@@ -93,3 +107,4 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig)
+
