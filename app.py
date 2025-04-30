@@ -65,7 +65,7 @@ if path.shape[0] > 1:
         abs(path[:, 0].max() - path[:, 0].min()),
         abs(path[:, 1].max() - path[:, 1].min()),
     )
-    spread = max(max_range * 1.2, 3.5)  # margen más ajustado
+    spread = max(max_range * 1.2, 1.15)  # margen más ajustado
 
     x_min, x_max = x_center - spread, x_center + spread
     y_min, y_max = y_center - spread, y_center + spread
