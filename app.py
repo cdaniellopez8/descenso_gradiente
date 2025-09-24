@@ -12,6 +12,12 @@ import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
 
+st.set_page_config(
+    page_title="Descenso Gradiente",
+    page_icon="🧠",  # 🤖🕸️
+    layout="wide"
+)
+
 # --- Función objetivo y gradiente ---
 def f(x, y):
     return x**2 + y**2
@@ -127,3 +133,4 @@ if path.shape[0] > 1:
     )
 
     st.plotly_chart(fig)
+
